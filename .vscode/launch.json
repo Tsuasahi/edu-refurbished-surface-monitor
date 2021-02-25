@@ -13,7 +13,7 @@
       ],
       "args": [
         "--wxkey",
-        "******************"
+        "SCU160919Tca163d00073f23ced845540f9ed08e366030997dd0c5d"
       ],
       "program": "${workspaceFolder}\\src\\index.js"
     }
