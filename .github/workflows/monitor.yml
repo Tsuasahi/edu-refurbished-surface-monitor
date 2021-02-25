@@ -45,4 +45,4 @@ jobs:
     - name: Run Monitor
       env:
           wxkey: ${{secrets.wxkey}}
-      run: node src/index.js --wxkey=${wxkey}
+      run: node src/index.js
