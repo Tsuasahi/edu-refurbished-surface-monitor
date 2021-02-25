@@ -23,7 +23,7 @@ function sleep(sleepTime) {
 
 function weixinNotify(key, logDesc, logDesp) {
   const data = {
-    msg: logDesc,
+    msg: "@at=-1@" + logDesc,
     desp: logDesp,
   };
   const dataStr = querystring.stringify(data);
