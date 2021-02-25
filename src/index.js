@@ -87,7 +87,7 @@ async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/
                 console.group('notifyMsg : ');
                 console.log(notifyMsg);
                 console.groupEnd();
-                const notifyResult = await weixinNotify(argv.wxkey, 'Surface GO 128G 到货通知测试2', notifyMsg);
+                const notifyResult = await weixinNotify(argv.wxkey, 'Surface GO 128G 已到货', notifyMsg);
                 console.log(`notifyResult : `, notifyResult);
                 isAlreadyNotify = true;
               }
@@ -108,4 +108,4 @@ async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/
   }
 }
 
-run(/Surface Go|Surface Pro 6/, /4415Y\/8GB\/128GB|i7\/8GB\/256GB/);
+run(/Surface Go/, /4415Y\/8GB\/128GB/);
