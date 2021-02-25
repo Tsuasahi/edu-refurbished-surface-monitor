@@ -23,11 +23,12 @@ function sleep(sleepTime) {
 
 function weixinNotify(key, logDesc, logDesp) {
   const data = {
-    text: logDesc,
+    msg: logDesc,
     desp: logDesp,
   };
   const dataStr = querystring.stringify(data);
-  return axios.default.post(`https://sc.ftqq.com/${key}.send`, dataStr).then(res => res.data);
+  return axios.default.post(`https://qmsg.zendee.cn/group/7effc8255de8031b45c915a456dde2ba`, dataStr).then(res => res.data);
+
 }
 
 function formatDate(date, fmt) {
@@ -50,8 +51,6 @@ function formatDate(date, fmt) {
   return fmt;
 }
 
-let LAST_PRODUCTS_VARIANTS = [];
-
 async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/) {
   const startDate = new Date();
   while (true) {
@@ -69,35 +68,12 @@ async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/
         // 当前可买的,按价格从低到高
         console.clear();
         let isAlreadyNotify = false;
-        const productVariants = products
+        products
           .map(x => x.variants)
           .reduce((acc, cur) => acc.concat(cur), [])
           .filter(x => x.product.private_price && x.product.qty_status === 'true')
-          .map(x => {
-            return {
-              ...x,
-              price: Number(x.product.private_price.replace('￥ ', '').replace(',', '')),
-            };
-          })
-          .sort((a, b) => a.price - b.price);
-        productVariants.forEach(x => console.log(`${x.product.name} ${x.product.sub_name}  :   ${x.product.private_price}`));
-        if (LAST_PRODUCTS_VARIANTS.length > 0) {
-          const priceCutProducts = productVariants.filter(x =>
-            x.product.qty_status === 'true' &&
-            LAST_PRODUCTS_VARIANTS.some(old => old.product.name === x.product.name && old.product.sub_name === x.product.sub_name && x.price < old.price)
-          );
-          if (priceCutProducts.length > 0) {
-            let notifyMsg = `####  以下Surface 已降价：\r\n\r\n${priceCutProducts.map(x => `> ${x.product.name} ${x.product.sub_name} ${x.product.private_price}`).join('\r\n\r\n')}`; //`${wantToBuyProduct.name} 已到货:\r\n${canBuyProducts.map(x => `${x.product.sub_name} ${x.product.private_price}`).join('\r\n')}`;
-              console.group('notifyMsg : ');
-              console.log(notifyMsg);
-              console.groupEnd();
-              const notifyResult = await weixinNotify(argv.wxkey, '微软教育优惠降价通知', notifyMsg);
-              console.log(`notifyResult : `, notifyResult);
-              isAlreadyNotify = true;
-          }
-        }
-        LAST_PRODUCTS_VARIANTS = productVariants;
-
+          .sort((a, b) => Number(a.product.private_price.replace('￥ ', '').replace(',', '')) - Number(b.product.private_price.replace('￥ ', '').replace(',', '')))
+          .forEach(x => console.log(`${x.product.name} ${x.product.sub_name}  :   ${x.product.private_price}`));
         const wantToBuyProducts = products.filter(x => wantToBuyProductNameRegex.test(x.name));
         if (wantToBuyProducts && wantToBuyProducts.length > 0) {
           for (const wantToBuyProduct of wantToBuyProducts) {
@@ -111,7 +87,7 @@ async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/
                 console.group('notifyMsg : ');
                 console.log(notifyMsg);
                 console.groupEnd();
-                const notifyResult = await weixinNotify(argv.wxkey, '微软教育优惠到货通知', notifyMsg);
+                const notifyResult = await weixinNotify(argv.wxkey, 'Surface GO 128G 到货通知测试2', notifyMsg);
                 console.log(`notifyResult : `, notifyResult);
                 isAlreadyNotify = true;
               }
@@ -128,8 +104,8 @@ async function run(wantToBuyProductNameRegex = /Surface Go/, sizeRegex = /128GB/
     } catch (error) {
       console.error(error);
     }
-    await sleep(Math.random() * 1000);
+    await sleep(Math.random() * 5000);
   }
 }
 
-run(/Surface Go/, /4415Y\/8GB\/128GB/);
+run(/Surface Go|Surface Pro 6/, /4415Y\/8GB\/128GB|i7\/8GB\/256GB/);
